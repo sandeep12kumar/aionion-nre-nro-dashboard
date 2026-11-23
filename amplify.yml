@@ -1,0 +1,19 @@
+# Amplify build settings for the NRI dashboard frontend.
+# If the repo also holds other apps, tick "My app is a monorepo" in Amplify and
+# set the app root to dashboard/frontend.
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - node_modules/**/*
