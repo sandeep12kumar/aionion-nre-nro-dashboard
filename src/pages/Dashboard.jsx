@@ -6,10 +6,10 @@ import { ErrorBox, Loading, StatCard, useLoader } from "../components/ui";
 const H2 = ({ children }) => <h2 className="mb-3 mt-8 text-lg font-bold text-slate-900 dark:text-white">{children}</h2>;
 const H3 = ({ children }) => <p className="mb-3 mt-5 text-xs font-semibold uppercase tracking-wide text-slate-500">{children}</p>;
 
+// (the table also allows 'abandoned', but the NRI flow never sets it)
 const STATUS = [
   ["in_progress", "In Progress", "default"],
   ["completed", "Completed", "green"],
-  ["abandoned", "Abandoned", "red"],
 ];
 
 export default function Dashboard() {
@@ -34,8 +34,8 @@ export default function Dashboard() {
           <StatCard label="Last 7 days" value={t.last7} />
         </div>
         <H3>Application status</H3>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {STATUS.filter(([key]) => t.byStatus[key] || key !== "abandoned").map(([key, label, tone]) => (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {STATUS.map(([key, label, tone]) => (
             <StatCard key={key} label={label} value={t.byStatus[key] || 0} tone={tone} onClick={() => go(`/clients?type=${type}&status=${key}`)} />
           ))}
         </div>
@@ -45,13 +45,12 @@ export default function Dashboard() {
 
   return (
     <div className={loading ? "opacity-60 transition" : ""}>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label="Total Applications" value={all.total} onClick={() => go("/clients")} />
         <StatCard label="NRE Accounts" value={types.NRE.total} onClick={() => go("/clients?type=NRE")} />
         <StatCard label="NRO Accounts" value={types.NRO.total} onClick={() => go("/clients?type=NRO")} />
-        <StatCard label="IPV Sessions" value={ipv.total} onClick={() => goIpv("/ipv")} />
       </div>
-      <div className="mt-4 grid gap-4 sm:grid-cols-3">
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {STATUS.map(([key, label, tone]) => (
           <StatCard key={key} label={label} value={all.byStatus[key] || 0} tone={tone} onClick={() => go(`/clients?status=${key}`)} />
         ))}

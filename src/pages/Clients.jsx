@@ -142,7 +142,7 @@ export default function Clients() {
           </select>
           <select className="input" value={filters.status} onChange={(e) => setFilters({ status: e.target.value })}>
             <option value="">All Statuses</option>
-            {Object.entries(STATUS_LABELS).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+            {Object.entries(STATUS_LABELS).filter(([k]) => k !== "abandoned").map(([k, l]) => <option key={k} value={k}>{l}</option>)}
           </select>
           <select className="input" value={filters.stage} onChange={(e) => setFilters({ stage: e.target.value })}>
             <option value="">All Stages{counts.data ? ` (${counts.data.total})` : ""}</option>
