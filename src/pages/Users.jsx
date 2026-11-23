@@ -4,7 +4,7 @@ import { MODULE_LABELS, ROLE_LABELS, useAuth } from "../lib/auth";
 import { fmtDate, fmtDateTime } from "../lib/format";
 import { Badge, ErrorBox, Field, Loading, Modal, PasswordInput, useLoader } from "../components/ui";
 
-const EMPTY = { username: "", password: "", fullName: "", email: "", role: "admin" };
+const EMPTY = { username: "", password: "", fullName: "", role: "admin" };
 
 function AddUser({ onAdded }) {
   const [form, setForm] = useState(EMPTY);
@@ -29,11 +29,10 @@ function AddUser({ onAdded }) {
 
   return (
     <form onSubmit={submit} className="card p-5">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(5,minmax(0,1fr))_auto] lg:items-end">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] lg:items-end">
         <Field label="Username"><input className="input" value={form.username} onChange={set("username")} autoComplete="off" /></Field>
         <Field label="Password"><PasswordInput value={form.password} onChange={set("password")} /></Field>
         <Field label="Full Name"><input className="input" value={form.fullName} onChange={set("fullName")} /></Field>
-        <Field label="Email"><input className="input" type="email" value={form.email} onChange={set("email")} /></Field>
         <Field label="Role">
           <select className="input" value={form.role} onChange={set("role")}>
             {Object.entries(ROLE_LABELS).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
@@ -51,7 +50,6 @@ function AddUser({ onAdded }) {
 
 function EditUser({ user, meta, onClose, onSaved, isSelf }) {
   const [fullName, setFullName] = useState(user.fullName || "");
-  const [email, setEmail] = useState(user.email || "");
   const [role, setRole] = useState(user.role);
   const [custom, setCustom] = useState(Boolean(user.customModules));
   const [modules, setModules] = useState(user.customModules || meta.roleModules[user.role]);
@@ -64,7 +62,7 @@ function EditUser({ user, meta, onClose, onSaved, isSelf }) {
     setBusy(true);
     setError("");
     try {
-      await api.patch(`/users/${user.id}`, { fullName, email, role, isActive, modules: custom ? modules.filter((m) => roleModules.includes(m)) : null });
+      await api.patch(`/users/${user.id}`, { fullName, role, isActive, modules: custom ? modules.filter((m) => roleModules.includes(m)) : null });
       onSaved();
     } catch (err) {
       setError(err.message);
@@ -77,8 +75,7 @@ function EditUser({ user, meta, onClose, onSaved, isSelf }) {
     <Modal open onClose={onClose} title={`Edit ${user.username}`} width="max-w-lg">
       <div className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Full name"><input className="input" value={fullName} onChange={(e) => setFullName(e.target.value)} /></Field>
-          <Field label="Email"><input className="input" value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
+          <Field label="Full name" className="sm:col-span-2"><input className="input" value={fullName} onChange={(e) => setFullName(e.target.value)} /></Field>
           <Field label="Role">
             <select className="input" value={role} disabled={isSelf} onChange={(e) => setRole(e.target.value)}>
               {Object.entries(ROLE_LABELS).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
@@ -171,7 +168,7 @@ export default function Users() {
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead className="bg-slate-50/80 dark:bg-slate-800/40">
-                <tr>{["Username", "Full Name", "Email", "Role", "Access", "Last login", "Created", ""].map((h) => <th key={h} className="th">{h}</th>)}</tr>
+                <tr>{["Username", "Full Name", "Role", "Access", "Last login", "Created", ""].map((h) => <th key={h} className="th">{h}</th>)}</tr>
               </thead>
               <tbody>
                 {data.users.map((u) => (
@@ -182,7 +179,6 @@ export default function Users() {
                       {u.lockedUntil && <span className="ml-2" title="Reset the password to unlock"><Badge tone="amber">Locked</Badge></span>}
                     </td>
                     <td className="td">{u.fullName || <span className="muted">N/A</span>}</td>
-                    <td className="td">{u.email || <span className="muted">N/A</span>}</td>
                     <td className="td">{ROLE_LABELS[u.role]}</td>
                     <td className="td">{u.customModules ? u.modules.map((m) => MODULE_LABELS[m]).join(", ") || "None" : "All pages (by role)"}</td>
                     <td className="td">{u.lastLoginAt ? fmtDateTime(u.lastLoginAt) : <span className="muted">Never</span>}</td>
