@@ -5,7 +5,7 @@ import { useAuth } from "../lib/auth";
 import { fmtDateTime12, fmtDuration, IPV_STATUS_LABELS } from "../lib/format";
 import DetailSections from "../components/DetailSections";
 import { DocumentsPanel, PreviewPanel, useFilePreview } from "../components/FileViewer";
-import { ErrorBox, Loading, StatusBadge, TypeBadge, useLoader } from "../components/ui";
+import { ErrorBox, Loading, StatusBadge, SummaryCard, TypeBadge, useLoader } from "../components/ui";
 
 const GROUPS = [
   ["Video Session", (k) => ["id", "status", "requested_at", "token_expires_at", "rm_joined_at", "client_joined_at", "started_at", "ended_at", "duration_seconds", "rm_email", "rm_remarks"].includes(k)],
@@ -37,43 +37,35 @@ export default function IpvDetail() {
   const recordings = data.files.filter((f) => f.id.includes(".recording."));
   const others = data.files.filter((f) => !f.id.includes(".recording."));
 
-  const items = [
-    ["IPV ID", i.id],
-    ["Client name", i.client_name],
-    ["PAN", i.pan_number ? (can("clients") ? <Link className="link" to={`/clients/${i.pan_number}`}>{i.pan_number}</Link> : i.pan_number) : null],
-    ["Account type", i.account_type ? <TypeBadge type={i.account_type} /> : null],
-    ["Client email", i.client_email],
-    ["RM", i.rm_email],
-    ["Status", <StatusBadge value={i.status} label={IPV_STATUS_LABELS[i.status]} />],
-    ["Requested", fmtDateTime12(i.requested_at)],
-    ["Call started", i.started_at ? fmtDateTime12(i.started_at) : null],
-    ["Duration", i.duration_seconds !== null && i.duration_seconds !== undefined ? fmtDuration(i.duration_seconds) : null],
-  ];
+  const pan = i.pan_number
+    ? (can("clients") ? <Link className="link" to={`/clients/${i.pan_number}`}>{i.pan_number}</Link> : i.pan_number)
+    : <span className="font-normal text-slate-400">Not verified yet</span>;
+  const location = i.client_place && (
+    <>
+      {i.client_place}
+      {i.client_latitude && (
+        <a className="link ml-2 text-xs font-medium" target="_blank" rel="noreferrer" href={`https://www.google.com/maps?q=${i.client_latitude},${i.client_longitude}`}>View on map</a>
+      )}
+    </>
+  );
 
   return (
     <div className="space-y-5">
       <button type="button" className="link text-sm" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/ipv"))}>← Back</button>
-      <div className="card border-emerald-200 px-5 py-4 dark:border-emerald-500/30">
-        <div className="flex flex-wrap gap-x-8 gap-y-3">
-          {items.map(([label, value]) => (
-            <div key={label}>
-              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">{label}</p>
-              <div className="mt-0.5 text-sm font-semibold text-slate-800 dark:text-slate-100">{value ?? <span className="muted">N/A</span>}</div>
-            </div>
-          ))}
-        </div>
-        {i.client_place && (
-          <div className="mt-3">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Client location</p>
-            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-              {i.client_place}
-              {i.client_latitude && (
-                <a className="link ml-2 text-xs" target="_blank" rel="noreferrer" href={`https://www.google.com/maps?q=${i.client_latitude},${i.client_longitude}`}>Map</a>
-              )}
-            </p>
-          </div>
-        )}
-      </div>
+      <SummaryCard
+        title={i.client_name}
+        badges={<>{i.account_type && <TypeBadge type={i.account_type} />}<StatusBadge value={i.status} label={IPV_STATUS_LABELS[i.status]} /></>}
+        meta={<>IPV ID <span className="font-semibold text-slate-800 dark:text-slate-100">#{i.id}</span></>}
+        items={[
+          ["PAN", pan],
+          ["Requested", fmtDateTime12(i.requested_at)],
+          ["Call started", i.started_at ? fmtDateTime12(i.started_at) : null],
+          ["Duration", i.duration_seconds !== null && i.duration_seconds !== undefined ? fmtDuration(i.duration_seconds) : null],
+          ["Client email", i.client_email, { wide: true }],
+          ["RM", i.rm_email, { wide: true }],
+          ["Client location", location, { wide: true }],
+        ]}
+      />
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.6fr)]">
         <DetailSections title="IPV Record" sections={sections} />

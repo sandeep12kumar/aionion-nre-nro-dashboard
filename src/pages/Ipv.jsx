@@ -30,7 +30,7 @@ export default function Ipv() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
           <SearchInput className="lg:col-span-2" value={filters.search} onChange={(search) => setFilters({ search })} placeholder="Search Name, PAN, Email, RM, ID…" />
           <select className="input" value={filters.type} onChange={(e) => setFilters({ type: e.target.value })}>
-            <option value="">NRI (all)</option><option value="NRE">NRE</option><option value="NRO">NRO</option><option value="UNLINKED">Not linked to a PAN yet</option>
+            <option value="">NRI (all)</option><option value="NRE">NRE</option><option value="NRO">NRO</option><option value="UNLINKED">PAN not verified yet</option>
           </select>
           <select className="input" value={filters.status} onChange={(e) => setFilters({ status: e.target.value })}>
             <option value="">All Statuses</option>

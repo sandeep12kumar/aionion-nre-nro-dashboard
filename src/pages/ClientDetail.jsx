@@ -4,7 +4,7 @@ import { api } from "../lib/api";
 import { fmtDateTime, fmtDuration, IPV_STATUS_LABELS, STATUS_LABELS, titleCase } from "../lib/format";
 import DetailSections from "../components/DetailSections";
 import { DocumentsPanel, PreviewPanel, useFilePreview } from "../components/FileViewer";
-import { CopyButton, ErrorBox, Loading, StatusBadge, TypeBadge, useLoader } from "../components/ui";
+import { CopyButton, ErrorBox, Loading, StatusBadge, SummaryCard, TypeBadge, useLoader } from "../components/ui";
 
 const PREFERENCES = [
   "depository_credit_instruction", "pledge_instruction", "account_statement_requirement", "electronic_transaction_statement",
@@ -42,19 +42,6 @@ function groupFields(row) {
   return [raw, ...groups].filter((g) => g.fields.length).map((g) => ({ ...g, open: g.title === "Application" }));
 }
 
-function Summary({ items }) {
-  return (
-    <div className="card flex flex-wrap gap-x-8 gap-y-3 border-emerald-200 px-5 py-4 dark:border-emerald-500/30">
-      {items.map(([label, value]) => (
-        <div key={label} className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">{label}</p>
-          <div className="mt-0.5 text-sm font-semibold text-slate-800 dark:text-slate-100">{value ?? <span className="muted">N/A</span>}</div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function ClientDetail() {
   const { pan } = useParams();
   const navigate = useNavigate();
@@ -71,19 +58,20 @@ export default function ClientDetail() {
   return (
     <div className="space-y-5">
       <button type="button" className="link text-sm" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/clients"))}>← Back to Clients</button>
-      <Summary items={[
-        ["Account type", <TypeBadge type={c.kyc_type} />],
-        ["Unique ID", c.unique_id],
-        ["Client name", c.client_name],
-        ["PAN", <span className="inline-flex items-center">{c.pan_number}<CopyButton value={c.pan_number} /></span>],
-        ["Client code", c.client_code],
-        ["Stage", data.stageLabel],
-        ["Current step", c.current_step ? titleCase(c.current_step) : null],
-        ["Status", <StatusBadge value={c.application_status} label={STATUS_LABELS[c.application_status]} />],
-        ["BOID", c.boid],
-        ["RM", c.rm_email],
-        ["Applied on", fmtDateTime(c.created_at)],
-      ]} />
+      <SummaryCard
+        title={c.client_name}
+        badges={<><TypeBadge type={c.kyc_type} /><StatusBadge value={c.application_status} label={STATUS_LABELS[c.application_status]} /></>}
+        meta={<>Unique ID <span className="font-semibold text-slate-800 dark:text-slate-100">{c.unique_id}</span></>}
+        items={[
+          ["PAN", <span className="inline-flex items-center">{c.pan_number}<CopyButton value={c.pan_number} /></span>],
+          ["Client code", c.client_code ? <span className="inline-flex items-center">{c.client_code}<CopyButton value={c.client_code} /></span> : null],
+          ["BOID", c.boid ? <span className="inline-flex items-center">{c.boid}<CopyButton value={c.boid} /></span> : null],
+          ["Applied on", fmtDateTime(c.created_at)],
+          ["Stage", data.stageLabel],
+          ["Current step", c.current_step ? titleCase(c.current_step) : null],
+          ["RM", c.rm_email, { wide: true }],
+        ]}
+      />
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.6fr)]">
         <DetailSections title={`${c.kyc_type} Application`} sections={sections} />

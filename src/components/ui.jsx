@@ -218,6 +218,33 @@ export function useLoader(load, deps) {
   return { ...state, reload: () => setTick((t) => t + 1) };
 }
 
+// The summary at the top of a detail page: a heading row (title + badges,
+// meta on the right) and an even grid of label / value pairs underneath.
+// items: [[label, value, { wide }], ...] -- wide takes two columns (emails, places)
+export function SummaryCard({ title, badges, meta, items }) {
+  return (
+    <div className="card overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-6 py-4 dark:border-slate-800">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
+          <h2 className="truncate text-xl font-bold text-slate-900 dark:text-white">{title || <span className="muted">Name not known yet</span>}</h2>
+          {badges}
+        </div>
+        {meta && <div className="text-sm text-slate-500">{meta}</div>}
+      </div>
+      <dl className="grid grid-cols-1 gap-x-8 gap-y-5 px-6 py-5 sm:grid-cols-2 lg:grid-cols-4">
+        {items.map(([label, value, options = {}]) => (
+          <div key={label} className={`min-w-0 ${options.wide ? "sm:col-span-2" : ""}`}>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-500">{label}</dt>
+            <dd className="mt-1 break-words text-sm font-semibold text-slate-800 dark:text-slate-100">
+              {value === null || value === undefined || value === "" ? <span className="font-normal text-slate-400">N/A</span> : value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
 export function Field({ label, children, className = "" }) {
   return (
     <label className={`block ${className}`}>
