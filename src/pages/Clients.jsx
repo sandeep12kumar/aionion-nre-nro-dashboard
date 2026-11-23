@@ -7,7 +7,17 @@ import { Badge, CopyButton, Empty, ErrorBox, Pagination, SearchInput, StatusBadg
 import { ChevronIcon, DownloadIcon } from "../components/icons";
 
 const DEFAULTS = { search: "", type: "", status: "", stage: "", from: "", to: "", page: 1, pageSize: 25, sort: "created_at", dir: "desc" };
-const COLUMNS_KEY = "nri_dash_client_columns";
+// v2: the default columns changed, so everyone's earlier choice is reset once
+const COLUMNS_KEY = "nri_dash_client_columns_v2";
+// the default columns, in this order
+const DEFAULT_COLUMNS = [
+  "created_at", "unique_id", "kyc_type", "client_code", "client_name", "pan_number",
+  "registered_email", "mobile", "stage_key", "application_status", "payment_state", "esign_status",
+];
+const defaultColumns = (available) => {
+  const known = new Set(available.map((c) => c.key));
+  return DEFAULT_COLUMNS.filter((k) => known.has(k));
+};
 const COPY = new Set(["pan_number", "client_code", "mobile", "boid", "unique_id"]);
 const STAGE_TONES = { esigned: "green", submitted: "green", yet_to_esign: "violet", yet_to_submit: "violet", payment: "amber", live_photo: "amber" };
 const SORTABLE = new Set(["created_at", "updated_at", "unique_id", "client_name", "pan_number", "kyc_type", "stage_key", "application_status"]);
@@ -41,7 +51,7 @@ function ColumnPicker({ available, chosen, onChange }) {
         <div className="card absolute right-0 z-30 mt-2 w-80 p-3">
           <input className="input !h-9" placeholder="Find a column…" value={find} onChange={(e) => setFind(e.target.value)} />
           <div className="mt-2 flex gap-3 text-xs">
-            <button type="button" className="link" onClick={() => onChange(available.filter((c) => c.default).map((c) => c.key))}>Default</button>
+            <button type="button" className="link" onClick={() => onChange(defaultColumns(available))}>Default</button>
             <button type="button" className="link" onClick={() => onChange(["pan_number"])}>Clear</button>
           </div>
           <div className="mt-2 max-h-80 space-y-0.5 overflow-y-auto">
@@ -72,7 +82,7 @@ export default function Clients() {
       setChosen((current) => {
         const known = new Set(data.columns.map((c) => c.key));
         const valid = (current || []).filter((k) => known.has(k));
-        return valid.length ? valid : data.columns.filter((c) => c.default).map((c) => c.key);
+        return valid.length ? valid : defaultColumns(data.columns);
       });
     }).catch(() => setMeta({ columns: [], stages: [] }));
   }, []);
