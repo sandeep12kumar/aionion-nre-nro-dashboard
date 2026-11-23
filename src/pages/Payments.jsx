@@ -7,7 +7,7 @@ import { useUrlFilters } from "../lib/useUrlFilters";
 import { Badge, Drawer, Empty, ErrorBox, Loading, Pagination, SearchInput, StatCard, StatusBadge, TypeBadge, useLoader } from "../components/ui";
 import { DownloadIcon } from "../components/icons";
 
-const DEFAULTS = { name: "", mobile: "", txn: "", pan: "", type: "", status: "", from: "", to: "", showTest: "", page: 1, pageSize: 25, sort: "payment_date", dir: "desc" };
+const DEFAULTS = { search: "", type: "", status: "", from: "", to: "", page: 1, pageSize: 25, sort: "payment_date", dir: "desc" };
 
 function PaymentDrawer({ pan, onClose }) {
   const { can } = useAuth();
@@ -100,23 +100,20 @@ export default function Payments() {
   return (
     <div className="space-y-5">
       {s ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard label="Total transactions" value={s.total.count} sub={fmtMoney(s.total.amount)} active={!filters.status} onClick={() => setFilters({ status: "" })} />
           <StatCard label="Successful transactions" value={s.success.count} sub={fmtMoney(s.success.amount)} tone="green" active={filters.status === "success"} onClick={() => setFilters({ status: "success" })} />
           <StatCard label="Pending transactions" value={s.pending.count} sub={fmtMoney(s.pending.amount)} tone="amber" active={filters.status === "pending"} onClick={() => setFilters({ status: "pending" })} />
           <StatCard label="Failed transactions" value={s.failed.count} sub={fmtMoney(s.failed.amount)} tone="red" active={filters.status === "failed"} onClick={() => setFilters({ status: "failed" })} />
-          <StatCard label="Test (dev bypass)" value={s.test.count} sub={fmtMoney(s.test.amount)} active={filters.showTest === "1"} onClick={() => setFilters({ showTest: filters.showTest === "1" ? "" : "1" })} />
         </div>
       ) : loading ? <Loading /> : null}
 
       <div className="card p-4 sm:p-5">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-8">
-          <SearchInput value={filters.name} onChange={(name) => setFilters({ name })} placeholder="Client Name" />
-          <SearchInput value={filters.mobile} onChange={(mobile) => setFilters({ mobile })} placeholder="Mobile Number" />
-          <SearchInput value={filters.txn} onChange={(txn) => setFilters({ txn })} placeholder="Transaction ID" />
-          <SearchInput value={filters.pan} onChange={(pan) => setFilters({ pan })} placeholder="PAN" />
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+          <SearchInput className="lg:col-span-2" value={filters.search} onChange={(search) => setFilters({ search })}
+            placeholder="Search Name, PAN, Mobile, Email, RM, Transaction ID…" />
           <select className="input" value={filters.type} onChange={(e) => setFilters({ type: e.target.value })}>
-            <option value="">NRI (NRE + NRO)</option><option value="NRE">NRE</option><option value="NRO">NRO</option>
+            <option value="">NRI (all)</option><option value="NRE">NRE</option><option value="NRO">NRO</option>
           </select>
           <select className="input" value={filters.status} onChange={(e) => setFilters({ status: e.target.value })}>
             <option value="">All Statuses</option><option value="success">Success</option><option value="pending">Pending</option><option value="failed">Failed</option>
@@ -124,13 +121,9 @@ export default function Payments() {
           <input type="date" className="input" value={filters.from} onChange={(e) => setFilters({ from: e.target.value })} title="Paid from" />
           <input type="date" className="input" value={filters.to} onChange={(e) => setFilters({ to: e.target.value })} title="Paid to" />
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-4">
-          <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-            <input type="checkbox" className="accent-violet-600" checked={filters.showTest === "1"} onChange={(e) => setFilters({ showTest: e.target.checked ? "1" : "" })} />
-            Show test payments
-          </label>
+        <div className="mt-3">
           <button type="button" className="btn-primary" onClick={exportCsv} disabled={exporting}>
-            <DownloadIcon className="h-4 w-4" /> {exporting ? "Exporting…" : "Export Report"}
+            <DownloadIcon className="h-4 w-4" /> {exporting ? "Exporting…" : "Export"}
           </button>
         </div>
         {exportError && <div className="mt-3"><ErrorBox error={exportError} /></div>}

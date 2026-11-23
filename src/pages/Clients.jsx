@@ -136,7 +136,7 @@ export default function Clients() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-7">
           <SearchInput className="2xl:col-span-2" value={filters.search} onChange={(search) => setFilters({ search })} placeholder="Search Name, PAN, Email, Mobile, ID, Client code, BOID…" />
           <select className="input" value={filters.type} onChange={(e) => setFilters({ type: e.target.value })}>
-            <option value="">NRI (NRE + NRO)</option>
+            <option value="">NRI (all)</option>
             <option value="NRE">NRE</option>
             <option value="NRO">NRO</option>
           </select>
