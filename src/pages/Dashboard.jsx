@@ -11,7 +11,6 @@ const STATUS = [
   ["completed", "Completed", "green"],
   ["abandoned", "Abandoned", "red"],
 ];
-const STAGE_TONES = { esigned: "green", submitted: "green" };
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -22,7 +21,7 @@ export default function Dashboard() {
 
   if (loading && !data) return <Loading />;
   if (error && !data) return <ErrorBox error={error} onRetry={reload} />;
-  const { applications: all, types, stages, ipv, boid } = data;
+  const { applications: all, types, ipv, boid } = data;
 
   const typeSection = (type) => {
     const t = types[type];
@@ -38,13 +37,6 @@ export default function Dashboard() {
         <div className="grid gap-4 sm:grid-cols-3">
           {STATUS.filter(([key]) => t.byStatus[key] || key !== "abandoned").map(([key, label, tone]) => (
             <StatCard key={key} label={label} value={t.byStatus[key] || 0} tone={tone} onClick={() => go(`/clients?type=${type}&status=${key}`)} />
-          ))}
-        </div>
-        <H3>Application stage</H3>
-        <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
-          {stages.map((s) => (
-            <StatCard key={s.key} label={s.label} value={t.byStage[s.key] || 0} tone={t.byStage[s.key] ? STAGE_TONES[s.key] || "default" : "default"}
-              onClick={() => go(`/clients?type=${type}&stage=${s.key}`)} />
           ))}
         </div>
       </section>

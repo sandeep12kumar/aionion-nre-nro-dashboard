@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api, downloadExport } from "../lib/api";
 import { fmtDateTime12, fmtDuration, IPV_STATUS_LABELS } from "../lib/format";
 import { useUrlFilters } from "../lib/useUrlFilters";
-import { CopyButton, Empty, ErrorBox, Pagination, SearchInput, StatusBadge, TypeBadge, useLoader } from "../components/ui";
+import { CopyButton, Empty, ErrorBox, Pagination, SearchInput, StatCard, StatusBadge, TypeBadge, useLoader } from "../components/ui";
 import { DownloadIcon } from "../components/icons";
 
 const DEFAULTS = { search: "", type: "", status: "", from: "", to: "", page: 1, pageSize: 25 };
@@ -24,8 +24,20 @@ export default function Ipv() {
     }
   };
 
+  const s = data?.summary; // (older API without it: no cards)
+
   return (
     <div className="space-y-5">
+      {s && (
+        <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-5">
+          <StatCard label="Total IPV" value={s.total} active={!filters.status} onClick={() => setFilters({ status: "" })} />
+          <StatCard label="Completed" value={s.completed} tone="green" active={filters.status === "completed"} onClick={() => setFilters({ status: "completed" })} />
+          <StatCard label="Live" value={s.live} tone="violet" active={filters.status === "live"} onClick={() => setFilters({ status: "live" })} />
+          <StatCard label="Requested" value={s.requested} tone="amber" active={filters.status === "requested"} onClick={() => setFilters({ status: "requested" })} />
+          <StatCard label="Cancelled" value={s.cancelled} tone="red" active={filters.status === "cancelled"} onClick={() => setFilters({ status: "cancelled" })} />
+        </div>
+      )}
+
       <div className="card p-4 sm:p-5">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
           <SearchInput className="lg:col-span-2" value={filters.search} onChange={(search) => setFilters({ search })} placeholder="Search Name, PAN, Email, RM, ID…" />
