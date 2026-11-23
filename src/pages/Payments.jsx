@@ -44,7 +44,7 @@ function PaymentDrawer({ pan, onClose }) {
           <p className="mb-3 mt-6 text-xs font-semibold uppercase tracking-wide text-slate-500">All attempts ({data.attempts.length})</p>
           <div className="space-y-3">
             {data.attempts.map((a) => (
-              <div key={a.txn_key} className={`rounded-xl border p-4 ${a.status === "success" ? "border-violet-400 dark:border-violet-500/50" : "border-slate-200 dark:border-slate-700"}`}>
+              <div key={a.txn_key} className={`rounded-xl border p-4 ${a.status === "success" ? "border-primary-400 dark:border-primary-500/50" : "border-slate-200 dark:border-slate-700"}`}>
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-mono text-xs text-slate-600 dark:text-slate-300">{a.txn_key}</span>
                   <span className="flex gap-1">{a.is_test && <Badge tone="pink">Test</Badge>}<StatusBadge value={a.status} /></span>
@@ -92,7 +92,7 @@ export default function Payments() {
   };
   const sortBy = (key) => setFilters({ sort: key, dir: filters.sort === key && filters.dir === "desc" ? "asc" : "desc" });
   const Th = ({ k, children }) => (
-    <th className={`th ${k ? "cursor-pointer select-none hover:text-violet-600" : ""}`} onClick={k ? () => sortBy(k) : undefined}>
+    <th className={`th ${k ? "cursor-pointer select-none hover:text-primary-600" : ""}`} onClick={k ? () => sortBy(k) : undefined}>
       {children}{k && filters.sort === k ? (filters.dir === "asc" ? " ↑" : " ↓") : ""}
     </th>
   );

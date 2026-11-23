@@ -15,7 +15,7 @@ const TONES = {
   green: "text-emerald-600 dark:text-emerald-400",
   amber: "text-amber-500",
   red: "text-red-500",
-  violet: "text-violet-600 dark:text-violet-400",
+  violet: "text-primary-600 dark:text-primary-400",
 };
 
 // A number card. Clickable when onClick is given; `active` outlines it.
@@ -25,8 +25,8 @@ export function StatCard({ label, value, sub, tone = "default", subTone, onClick
     <Tag
       type={onClick ? "button" : undefined}
       onClick={onClick}
-      className={`card w-full p-5 text-left transition ${onClick ? "hover:border-violet-300 hover:shadow-md" : ""} ${
-        active ? "!border-violet-500 ring-1 ring-violet-500" : ""
+      className={`card w-full p-5 text-left transition ${onClick ? "hover:border-primary-300 hover:shadow-md" : ""} ${
+        active ? "!border-primary-500 ring-1 ring-primary-500" : ""
       }`}
     >
       <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</p>
@@ -41,7 +41,7 @@ const BADGES = {
   amber: "bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/30",
   red: "bg-red-50 text-red-700 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/30",
   blue: "bg-blue-50 text-blue-700 ring-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:ring-blue-500/30",
-  violet: "bg-violet-50 text-violet-700 ring-violet-200 dark:bg-violet-500/10 dark:text-violet-300 dark:ring-violet-500/30",
+  violet: "bg-primary-50 text-primary-700 ring-primary-200 dark:bg-primary-500/10 dark:text-primary-300 dark:ring-primary-500/30",
   slate: "bg-slate-100 text-slate-600 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700",
   pink: "bg-rose-50 text-rose-600 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-500/30",
 };
@@ -88,7 +88,7 @@ export function CopyButton({ value, className = "" }) {
 }
 
 export const Spinner = ({ className = "h-5 w-5" }) => (
-  <span className={`inline-block animate-spin rounded-full border-2 border-violet-500 border-t-transparent ${className}`} aria-label="Loading" />
+  <span className={`inline-block animate-spin rounded-full border-2 border-primary-500 border-t-transparent ${className}`} aria-label="Loading" />
 );
 
 export function Loading({ text = "Loading…" }) {
@@ -180,7 +180,7 @@ export function PasswordInput({ value, onChange, placeholder, autoComplete = "ne
   return (
     <div className="relative">
       <input id={id} className="input pr-16" type={show ? "text" : "password"} value={value} onChange={onChange} placeholder={placeholder} autoComplete={autoComplete} />
-      <button type="button" onClick={() => setShow((s) => !s)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-violet-50 px-2 py-1 text-xs font-medium text-violet-700 dark:bg-violet-500/10 dark:text-violet-300">
+      <button type="button" onClick={() => setShow((s) => !s)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-primary-50 px-2 py-1 text-xs font-medium text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">
         {show ? "Hide" : "Show"}
       </button>
     </div>

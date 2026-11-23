@@ -57,7 +57,7 @@ function ColumnPicker({ available, chosen, onChange }) {
           <div className="mt-2 max-h-80 space-y-0.5 overflow-y-auto">
             {shown.map((c) => (
               <label key={c.key} className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-slate-50 dark:hover:bg-slate-800">
-                <input type="checkbox" className="accent-violet-600" checked={chosen.includes(c.key)} disabled={c.key === "pan_number"} onChange={() => toggle(c.key)} />
+                <input type="checkbox" className="accent-primary-600" checked={chosen.includes(c.key)} disabled={c.key === "pan_number"} onChange={() => toggle(c.key)} />
                 <span className="truncate">{c.label}</span>
               </label>
             ))}
@@ -183,7 +183,7 @@ export default function Clients() {
             <thead className="bg-slate-50/80 dark:bg-slate-800/40">
               <tr>
                 {columns.map((c) => (
-                  <th key={c.key} className={`th ${SORTABLE.has(c.key) ? "cursor-pointer select-none hover:text-violet-600" : ""}`} onClick={() => sortBy(c.key)}>
+                  <th key={c.key} className={`th ${SORTABLE.has(c.key) ? "cursor-pointer select-none hover:text-primary-600" : ""}`} onClick={() => sortBy(c.key)}>
                     {c.label}{filters.sort === c.key ? (filters.dir === "asc" ? " ↑" : " ↓") : ""}
                   </th>
                 ))}

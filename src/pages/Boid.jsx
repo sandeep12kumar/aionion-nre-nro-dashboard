@@ -79,7 +79,7 @@ function Uploader({ onDone }) {
   return (
     <div className="card max-w-3xl">
       <div className="flex items-start gap-4 border-b border-slate-100 p-5 dark:border-slate-800">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 text-violet-600 dark:bg-violet-500/15"><UploadIcon /></span>
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 text-primary-600 dark:bg-primary-500/15"><UploadIcon /></span>
         <div>
           <p className="font-semibold text-slate-900 dark:text-white">NRI BOID Upload</p>
           <p className="text-sm text-slate-500">Add new BOIDs to the NRE - NRO stock (nre_nro.boid_numbers) from an Excel or CSV file</p>
@@ -90,9 +90,9 @@ function Uploader({ onDone }) {
           onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
           onDragLeave={() => setDrag(false)}
           onDrop={(e) => { e.preventDefault(); setDrag(false); choose(e.dataTransfer.files?.[0]); }}
-          className={`rounded-xl border-2 border-dashed p-8 text-center transition ${drag ? "border-violet-500 bg-violet-50 dark:bg-violet-500/10" : "border-slate-200 bg-slate-50/60 dark:border-slate-700 dark:bg-slate-800/30"}`}
+          className={`rounded-xl border-2 border-dashed p-8 text-center transition ${drag ? "border-primary-500 bg-primary-50 dark:bg-primary-500/10" : "border-slate-200 bg-slate-50/60 dark:border-slate-700 dark:bg-slate-800/30"}`}
         >
-          <UploadIcon className="mx-auto h-6 w-6 text-violet-500" />
+          <UploadIcon className="mx-auto h-6 w-6 text-primary-500" />
           <p className="mt-2 text-sm">
             <button type="button" className="link" onClick={() => input.current?.click()}>Click to choose</button> or drag a file here
           </p>

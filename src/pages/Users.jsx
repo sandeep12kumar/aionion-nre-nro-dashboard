@@ -93,16 +93,16 @@ function EditUser({ user, meta, onClose, onSaved, isSelf }) {
         <div>
           <p className="label">Access</p>
           <label className="flex items-center gap-2 text-sm">
-            <input type="radio" className="accent-violet-600" checked={!custom} onChange={() => setCustom(false)} /> All pages of the role
+            <input type="radio" className="accent-primary-600" checked={!custom} onChange={() => setCustom(false)} /> All pages of the role
           </label>
           <label className="mt-1 flex items-center gap-2 text-sm">
-            <input type="radio" className="accent-violet-600" checked={custom} onChange={() => setCustom(true)} /> Only these pages:
+            <input type="radio" className="accent-primary-600" checked={custom} onChange={() => setCustom(true)} /> Only these pages:
           </label>
           {custom && (
             <div className="mt-2 grid grid-cols-2 gap-1 pl-6">
               {roleModules.map((m) => (
                 <label key={m} className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" className="accent-violet-600" checked={modules.includes(m)}
+                  <input type="checkbox" className="accent-primary-600" checked={modules.includes(m)}
                     onChange={() => setModules((list) => (list.includes(m) ? list.filter((x) => x !== m) : [...list, m]))} />
                   {MODULE_LABELS[m]}
                 </label>

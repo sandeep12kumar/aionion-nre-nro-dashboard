@@ -18,7 +18,7 @@ export default function DetailSections({ title, sections }) {
 
   return (
     <div className="card overflow-hidden">
-      <div className="bg-violet-50 px-4 py-3 text-center text-sm font-semibold text-violet-700 dark:bg-violet-500/10 dark:text-violet-300">{title}</div>
+      <div className="bg-primary-50 px-4 py-3 text-center text-sm font-semibold text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">{title}</div>
       <div className="p-3">
         <input className="input !h-10" placeholder="Find a field or value…" value={filter} onChange={(e) => setFilter(e.target.value)} />
       </div>

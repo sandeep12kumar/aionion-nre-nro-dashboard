@@ -77,7 +77,7 @@ export function DocumentsPanel({ groups, viewer }) {
 
   return (
     <div className="card overflow-hidden">
-      <div className="bg-violet-50 px-4 py-3 text-center text-sm font-semibold text-violet-700 dark:bg-violet-500/10 dark:text-violet-300">Documents</div>
+      <div className="bg-primary-50 px-4 py-3 text-center text-sm font-semibold text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">Documents</div>
       <div className="divide-y divide-slate-100 dark:divide-slate-800">
         {groups.map((group) => (
           <div key={group.title} className="px-3 py-3">
@@ -85,7 +85,7 @@ export function DocumentsPanel({ groups, viewer }) {
             {group.files.length ? group.files.map((file) => (
               <div
                 key={file.id}
-                className={`group flex items-center gap-2 rounded-lg px-2 py-2 text-sm ${viewer.selected?.id === file.id ? "bg-violet-50 dark:bg-violet-500/10" : "hover:bg-slate-50 dark:hover:bg-slate-800/60"}`}
+                className={`group flex items-center gap-2 rounded-lg px-2 py-2 text-sm ${viewer.selected?.id === file.id ? "bg-primary-50 dark:bg-primary-500/10" : "hover:bg-slate-50 dark:hover:bg-slate-800/60"}`}
               >
                 <FileIcon className="h-4 w-4 shrink-0 text-slate-400" />
                 <button type="button" onClick={() => (file.openOnly ? viewer.openInTab(file) : viewer.view(file))} className="min-w-0 flex-1 text-left">
@@ -93,11 +93,11 @@ export function DocumentsPanel({ groups, viewer }) {
                   {file.uploadedAt && <span className="block text-xs text-slate-400">{fmtDateTime(file.uploadedAt)}</span>}
                 </button>
                 {file.openOnly && (
-                  <button type="button" title="Open in a new tab" onClick={() => viewer.openInTab(file)} className="rounded-md px-2 py-1 text-xs font-medium text-violet-600 hover:bg-white dark:text-violet-400 dark:hover:bg-slate-900">
+                  <button type="button" title="Open in a new tab" onClick={() => viewer.openInTab(file)} className="rounded-md px-2 py-1 text-xs font-medium text-primary-600 hover:bg-white dark:text-primary-400 dark:hover:bg-slate-900">
                     Open
                   </button>
                 )}
-                <button type="button" title="Download" onClick={() => viewer.download(file)} className="rounded-md p-1.5 text-slate-400 hover:bg-white hover:text-violet-600 dark:hover:bg-slate-900">
+                <button type="button" title="Download" onClick={() => viewer.download(file)} className="rounded-md p-1.5 text-slate-400 hover:bg-white hover:text-primary-600 dark:hover:bg-slate-900">
                   <DownloadIcon className="h-4 w-4" />
                 </button>
               </div>

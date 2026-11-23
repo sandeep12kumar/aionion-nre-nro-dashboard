@@ -4,17 +4,33 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-200;
+    @apply text-slate-800 antialiased dark:text-slate-200;
+    /* soft Aionion blue / pink light from the corners */
+    background-color: #f6f7fb;
+    background-image:
+      radial-gradient(60rem 32rem at -10% -15%, rgba(0, 35, 255, 0.06), transparent 60%),
+      radial-gradient(50rem 30rem at 110% -5%, rgba(254, 102, 124, 0.08), transparent 60%);
+    background-attachment: fixed;
+  }
+  .dark body {
+    background-color: #050816;
+    background-image:
+      radial-gradient(60rem 32rem at -10% -15%, rgba(0, 35, 255, 0.16), transparent 60%),
+      radial-gradient(50rem 30rem at 110% -5%, rgba(254, 102, 124, 0.1), transparent 60%);
   }
 }
 
 @layer components {
+  /* the thin blue -> pink line across the top */
+  .brand-strip {
+    @apply h-1 w-full bg-brand-gradient;
+  }
   .card {
-    @apply rounded-2xl border border-slate-200/70 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900;
+    @apply rounded-3xl border border-slate-200/60 bg-white shadow-soft dark:border-slate-800 dark:bg-slate-900;
   }
   .input {
     @apply h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-800 outline-none transition
-      placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20
+      placeholder:text-slate-400 hover:border-slate-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/15
       dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500;
   }
   .label {
@@ -24,16 +40,16 @@
     @apply inline-flex h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-violet-600 text-white shadow-sm hover:bg-violet-700;
+    @apply btn bg-primary-600 font-semibold text-white shadow-brand hover:-translate-y-0.5 hover:bg-primary-700 active:translate-y-0 disabled:translate-y-0;
   }
   .btn-outline {
-    @apply btn border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800;
+    @apply btn border border-slate-200 bg-white text-slate-700 shadow-sm hover:border-primary-300 hover:text-primary-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800;
   }
   .btn-sm {
     @apply h-8 rounded-lg px-3 text-xs;
   }
   .link {
-    @apply font-medium text-violet-600 hover:text-violet-700 hover:underline dark:text-violet-400;
+    @apply font-medium text-primary-600 hover:text-primary-700 hover:underline dark:text-primary-400;
   }
   .th {
     @apply whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400;
