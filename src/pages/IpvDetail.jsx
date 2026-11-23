@@ -56,14 +56,10 @@ export default function IpvDetail() {
         title={i.client_name}
         badges={<>{i.account_type && <TypeBadge type={i.account_type} />}<StatusBadge value={i.status} label={IPV_STATUS_LABELS[i.status]} /></>}
         meta={<>IPV ID <span className="font-semibold text-slate-800 dark:text-slate-100">#{i.id}</span></>}
-        items={[
-          ["PAN", pan],
-          ["Requested", fmtDateTime12(i.requested_at)],
-          ["Call started", i.started_at ? fmtDateTime12(i.started_at) : null],
-          ["Duration", i.duration_seconds !== null && i.duration_seconds !== undefined ? fmtDuration(i.duration_seconds) : null],
-          ["Client email", i.client_email, { wide: true }],
-          ["RM", i.rm_email, { wide: true }],
-          ["Client location", location, { wide: true }],
+        columns={[
+          [["PAN", pan], ["Client email", i.client_email], ["RM", i.rm_email]],
+          [["Requested", fmtDateTime12(i.requested_at)], ["Call started", i.started_at ? fmtDateTime12(i.started_at) : null]],
+          [["Duration", i.duration_seconds !== null && i.duration_seconds !== undefined ? fmtDuration(i.duration_seconds) : null], ["Client location", location]],
         ]}
       />
 
