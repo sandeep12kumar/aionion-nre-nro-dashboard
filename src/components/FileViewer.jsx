@@ -45,7 +45,23 @@ export function useFilePreview(basePath) {
     }
   };
 
-  return { selected, preview, error, busy, view, download };
+  // Opens a file in a new browser tab (for long files like the Aadhaar XML).
+  // The tab is opened right on the click, so the browser doesn't block it as
+  // a pop-up, and pointed at the file once its link is ready.
+  const openInTab = async (file) => {
+    setError("");
+    const tab = window.open("", "_blank");
+    try {
+      const info = await openFile(`${basePath}/${encodeURIComponent(file.id)}`);
+      if (tab) tab.location.href = info.url;
+      else window.location.assign(info.url);
+    } catch (err) {
+      tab?.close();
+      setError(err.message);
+    }
+  };
+
+  return { selected, preview, error, busy, view, download, openInTab };
 }
 
 export function DocumentsPanel({ groups, viewer }) {
@@ -72,10 +88,15 @@ export function DocumentsPanel({ groups, viewer }) {
                 className={`group flex items-center gap-2 rounded-lg px-2 py-2 text-sm ${viewer.selected?.id === file.id ? "bg-violet-50 dark:bg-violet-500/10" : "hover:bg-slate-50 dark:hover:bg-slate-800/60"}`}
               >
                 <FileIcon className="h-4 w-4 shrink-0 text-slate-400" />
-                <button type="button" onClick={() => viewer.view(file)} className="min-w-0 flex-1 text-left">
+                <button type="button" onClick={() => (file.openOnly ? viewer.openInTab(file) : viewer.view(file))} className="min-w-0 flex-1 text-left">
                   <span className="block truncate font-medium text-slate-700 dark:text-slate-200">{file.label}</span>
                   {file.uploadedAt && <span className="block text-xs text-slate-400">{fmtDateTime(file.uploadedAt)}</span>}
                 </button>
+                {file.openOnly && (
+                  <button type="button" title="Open in a new tab" onClick={() => viewer.openInTab(file)} className="rounded-md px-2 py-1 text-xs font-medium text-violet-600 hover:bg-white dark:text-violet-400 dark:hover:bg-slate-900">
+                    Open
+                  </button>
+                )}
                 <button type="button" title="Download" onClick={() => viewer.download(file)} className="rounded-md p-1.5 text-slate-400 hover:bg-white hover:text-violet-600 dark:hover:bg-slate-900">
                   <DownloadIcon className="h-4 w-4" />
                 </button>

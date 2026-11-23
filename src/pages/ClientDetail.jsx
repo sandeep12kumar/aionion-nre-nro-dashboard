@@ -39,7 +39,7 @@ function groupFields(row) {
     const index = GROUPS.findIndex(([, test]) => test(key));
     (index === -1 ? raw : groups[index]).fields.push([key, value]);
   }
-  return [raw, ...groups].filter((g) => g.fields.length).map((g) => ({ ...g, open: g.title === "Application" }));
+  return [raw, ...groups].filter((g) => g.fields.length);
 }
 
 export default function ClientDetail() {

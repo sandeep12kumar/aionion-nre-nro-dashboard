@@ -66,6 +66,14 @@ function FieldValue({ name, value }) {
             <pre className="mt-1 max-h-80 overflow-auto rounded-lg bg-slate-900 p-3 text-xs text-slate-100">{JSON.stringify(value, null, 2)}</pre>
           )}
         </dd>
+      ) : typeof value === "string" && value.length > 300 ? (
+        // very long text (e.g. the Aadhaar photo as base64): folded
+        <dd className="mt-0.5">
+          <button type="button" className="link text-xs" onClick={() => setExpanded((e) => !e)}>
+            {expanded ? "Hide" : `Show (${value.length.toLocaleString("en-IN")} characters)`}
+          </button>
+          {expanded && <p className="mt-1 max-h-60 overflow-auto break-all rounded-lg bg-slate-100 p-2 font-mono text-xs dark:bg-slate-800">{value}</p>}
+        </dd>
       ) : (
         <dd className="mt-0.5 break-words text-sm font-semibold text-slate-800 dark:text-slate-100">{fmtValue(value, name)}</dd>
       )}
