@@ -48,6 +48,6 @@ export function fmtValue(value, key = "") {
 }
 
 // ISO yyyy-mm-dd from an <input type="date"> is passed through to the API
-export const STATUS_LABELS = { in_progress: "In Progress", completed: "Completed", abandoned: "Abandoned" };
+export const STATUS_LABELS = { in_progress: "In Progress", completed: "Completed", verified: "Verified", abandoned: "Abandoned" };
 export const IPV_STATUS_LABELS = { requested: "Requested", live: "Live", completed: "Completed", cancelled: "Cancelled" };
 export const SCHEME_LABELS = { lifeTime: "Lifetime", annualCare: "Annual Care" };

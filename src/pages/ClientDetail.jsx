@@ -60,6 +60,73 @@ function PaymentSkipModal({ open, onClose, client, onDone }) {
   );
 }
 
+// KYC verification: the KYC team checked every detail of a completed
+// application. The status then shows "Verified".
+function VerifyModal({ open, onClose, client, onDone }) {
+  const [remarks, setRemarks] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const close = () => {
+    if (busy) return;
+    setRemarks(""); setError("");
+    onClose();
+  };
+  const submit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setBusy(true);
+    try {
+      await api.post(`/clients/${encodeURIComponent(client.pan_number)}/verify`, { remarks: remarks.trim() });
+      setRemarks("");
+      onDone();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <Modal open={open} onClose={close} title="Verify this application">
+      <form onSubmit={submit} className="space-y-4">
+        <div className="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800/60">
+          <p className="font-semibold text-slate-800 dark:text-slate-100">{client.client_name} · {client.pan_number}</p>
+          <p className="mt-0.5 text-slate-500">{client.kyc_type} · Unique ID {client.unique_id}</p>
+        </div>
+        <p className="text-sm text-slate-600 dark:text-slate-300">Confirm that you have checked the details and documents and everything is correct. The status changes to <span className="font-semibold">Verified</span>.</p>
+        <Field label="Remarks (optional)">
+          <input className="input" value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="e.g. All documents checked" maxLength={500} autoFocus />
+        </Field>
+        {error && <p className="text-sm text-red-500">{error}</p>}
+        <div className="flex justify-end gap-2">
+          <button type="button" className="btn-outline" onClick={close} disabled={busy}>Cancel</button>
+          <button type="submit" className="btn-primary" disabled={busy}>{busy ? "Verifying…" : "Verify"}</button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+function VerifyValue({ state, onVerify }) {
+  if (!state) return null;
+  if (state.done) {
+    return (
+      <span className="block">
+        <StatusBadge value="verified" label="Verified" />
+        <span className="mt-1 block text-xs font-normal text-slate-500">by {state.by || "—"} · {fmtDateTime(state.at)}</span>
+        {state.remarks && <span className="block text-xs font-normal text-slate-500">{state.remarks}</span>}
+      </span>
+    );
+  }
+  return (
+    <span className="block">
+      <button type="button" className="btn-primary btn-sm" onClick={onVerify} disabled={!state.allowed} title={state.reason || "Mark this application as checked and verified"}>
+        Verify
+      </button>
+      {!state.allowed && state.reason && <span className="mt-1 block text-xs font-normal text-slate-400">{state.reason}</span>}
+    </span>
+  );
+}
+
 function StageValue({ label, skip, client, onSkip }) {
   return (
     <span className="inline-flex flex-wrap items-center gap-2">
@@ -87,7 +154,7 @@ const PREFERENCES = [
 // [title, test(key)] in display order; the first match wins, the rest go to "Logs & Raw Data".
 const GROUPS = [
   ["Application", (k) => ["id", "unique_id", "kyc_type", "pan_number", "account_type", "application_status", "current_step", "stage_key",
-    "client_name", "rm_email", "rm_login_verified_at", "has_aadhaar", "created_at", "updated_at"].includes(k)],
+    "client_name", "rm_email", "rm_login_verified_at", "has_aadhaar", "created_at", "updated_at"].includes(k) || k.startsWith("kyc_verified")],
   ["Contact", (k) => ["registered_email", "mobile"].includes(k) || k.startsWith("email_otp_")],
   ["PAN / ITR", (k) => k === "date_of_birth" || k.startsWith("itr_") && k !== "itr_raw_response" || k.startsWith("techexcel_") || k === "category_type" || k.startsWith("pan_card_")],
   ["Personal & FATCA", (k) => k.startsWith("personal_")],
@@ -121,6 +188,7 @@ export default function ClientDetail() {
   const viewer = useFilePreview(`/clients/${encodeURIComponent(pan)}/files`);
   const sections = useMemo(() => (data ? groupFields(data.client) : []), [data]);
   const [skipOpen, setSkipOpen] = useState(false);
+  const [verifyOpen, setVerifyOpen] = useState(false);
   const [notice, setNotice] = useState("");
 
   if (loading && !data) return <Loading />;
@@ -143,13 +211,24 @@ export default function ClientDetail() {
           ["Applied on", fmtDateTime(c.created_at)],
           ["Stage", <StageValue label={data.stageLabel} skip={data.paymentSkip} client={c} onSkip={() => setSkipOpen(true)} />],
           ["Current step", c.current_step ? titleCase(c.current_step) : null],
-          ["RM", c.rm_email, { wide: true }],
+          ["RM", c.rm_email],
+          ["KYC verification", <VerifyValue state={data.kycVerify} onVerify={() => setVerifyOpen(true)} />],
         ]}
       />
       {data.paymentSkip && !data.paymentSkip.allowed && c.stage_key === "payment" && (
         <p className="-mt-2 px-1 text-xs text-slate-500">Skip payment: {data.paymentSkip.reason}</p>
       )}
       {notice && <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">{notice}</p>}
+      <VerifyModal
+        open={verifyOpen}
+        onClose={() => setVerifyOpen(false)}
+        client={c}
+        onDone={() => {
+          setVerifyOpen(false);
+          setNotice("Application verified. The status is now Verified.");
+          reload();
+        }}
+      />
       <PaymentSkipModal
         open={skipOpen}
         onClose={() => setSkipOpen(false)}

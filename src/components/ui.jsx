@@ -16,6 +16,7 @@ const TONES = {
   amber: "text-amber-500",
   red: "text-red-500",
   violet: "text-primary-600 dark:text-primary-400",
+  teal: "text-teal-600 dark:text-teal-400",
 };
 
 // A number card. Clickable when onClick is given; `active` outlines it.
@@ -44,6 +45,7 @@ const BADGES = {
   violet: "bg-primary-50 text-primary-700 ring-primary-200 dark:bg-primary-500/10 dark:text-primary-300 dark:ring-primary-500/30",
   slate: "bg-slate-100 text-slate-600 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700",
   pink: "bg-rose-50 text-rose-600 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-500/30",
+  teal: "bg-teal-50 text-teal-700 ring-teal-300 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/30",
 };
 
 export function Badge({ tone = "slate", children }) {
@@ -56,7 +58,7 @@ export function TypeBadge({ type }) {
 }
 
 const STATUS_TONES = {
-  success: "green", completed: "green", esigned: "green", submitted: "green", verified: "green",
+  success: "green", completed: "green", esigned: "green", submitted: "green", verified: "teal",
   pending: "amber", requested: "amber", in_progress: "violet", live: "blue",
   failed: "red", cancelled: "slate", abandoned: "red",
 };

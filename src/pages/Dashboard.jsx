@@ -10,6 +10,7 @@ const H3 = ({ children }) => <p className="mb-3 mt-5 text-xs font-semibold upper
 const STATUS = [
   ["in_progress", "In Progress", "default"],
   ["completed", "Completed", "green"],
+  ["verified", "Verified", "teal"],
 ];
 
 export default function Dashboard() {
@@ -34,7 +35,7 @@ export default function Dashboard() {
           <StatCard label="Last 7 days" value={t.last7} />
         </div>
         <H3>Application status</H3>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
           {STATUS.map(([key, label, tone]) => (
             <StatCard key={key} label={label} value={t.byStatus[key] || 0} tone={tone} onClick={() => go(`/clients?type=${type}&status=${key}`)} />
           ))}
@@ -50,7 +51,7 @@ export default function Dashboard() {
         <StatCard label="NRE Accounts" value={types.NRE.total} onClick={() => go("/clients?type=NRE")} />
         <StatCard label="NRO Accounts" value={types.NRO.total} onClick={() => go("/clients?type=NRO")} />
       </div>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+      <div className="mt-4 grid gap-4 sm:grid-cols-3">
         {STATUS.map(([key, label, tone]) => (
           <StatCard key={key} label={label} value={all.byStatus[key] || 0} tone={tone} onClick={() => go(`/clients?status=${key}`)} />
         ))}
