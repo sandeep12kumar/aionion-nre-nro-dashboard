@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, openFile, saveBlob } from "../lib/api";
 import { fmtDateTime } from "../lib/format";
-import { DownloadIcon, FileIcon } from "./icons";
+import { ChevronIcon, DownloadIcon, FileIcon } from "./icons";
 import { Spinner } from "./ui";
 
 // Documents list (middle column) + preview (right column) of the detail pages.
@@ -64,7 +64,10 @@ export function useFilePreview(basePath) {
   return { selected, preview, error, busy, view, download, openInTab };
 }
 
+// Each group is a dropdown like the application sections: closed at first,
+// except a page's only group (or one passed with open: true).
 export function DocumentsPanel({ groups, viewer }) {
+  const [open, setOpen] = useState({});
   const [s3, setS3] = useState(null);
   const checkS3 = async () => {
     setS3({ checking: true });
@@ -79,9 +82,23 @@ export function DocumentsPanel({ groups, viewer }) {
     <div className="card overflow-hidden">
       <div className="bg-primary-50 px-4 py-3 text-center text-sm font-semibold text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">Documents</div>
       <div className="divide-y divide-slate-100 dark:divide-slate-800">
-        {groups.map((group) => (
-          <div key={group.title} className="px-3 py-3">
-            <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-slate-500">{group.title}</p>
+        {groups.map((group) => {
+          const isOpen = open[group.title] ?? (group.open ?? groups.length === 1);
+          return (
+          <div key={group.title}>
+            <button
+              type="button"
+              onClick={() => setOpen((o) => ({ ...o, [group.title]: !isOpen }))}
+              className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-slate-800 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800/50"
+            >
+              <span>
+                {group.title}
+                <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-slate-800">{group.files.length}</span>
+              </span>
+              <ChevronIcon className={`h-4 w-4 text-slate-400 transition ${isOpen ? "rotate-180" : ""}`} />
+            </button>
+            {isOpen && (
+            <div className="bg-slate-50/60 px-3 py-2 dark:bg-slate-950/30">
             {group.files.length ? group.files.map((file) => (
               <div
                 key={file.id}
@@ -102,8 +119,11 @@ export function DocumentsPanel({ groups, viewer }) {
                 </button>
               </div>
             )) : <p className="px-1 py-2 text-sm text-slate-400">No files</p>}
+            </div>
+            )}
           </div>
-        ))}
+          );
+        })}
       </div>
       {viewer.error && <p className="border-t border-slate-100 px-4 py-3 text-center text-sm text-red-500 dark:border-slate-800">{viewer.error}</p>}
       <div className="border-t border-slate-100 px-4 py-3 text-sm dark:border-slate-800">

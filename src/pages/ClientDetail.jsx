@@ -1,10 +1,82 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { fmtDateTime, fmtDuration, IPV_STATUS_LABELS, STATUS_LABELS, titleCase } from "../lib/format";
 import DetailSections from "../components/DetailSections";
 import { DocumentsPanel, PreviewPanel, useFilePreview } from "../components/FileViewer";
-import { CopyButton, ErrorBox, Loading, StatusBadge, SummaryCard, TypeBadge, useLoader } from "../components/ui";
+import { CopyButton, ErrorBox, Field, Loading, Modal, StatusBadge, SummaryCard, TypeBadge, useLoader } from "../components/ui";
+
+// Payment skip: a client who paid offline (e.g. into the office's common bank
+// account). Only at "Payment Pending"; the server checks it again.
+function PaymentSkipModal({ open, onClose, client, onDone }) {
+  const [transactionId, setTransactionId] = useState("");
+  const [remarks, setRemarks] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const amount = Number(client.scheme_total_amount || 0);
+
+  const close = () => {
+    if (busy) return;
+    setTransactionId(""); setRemarks(""); setError("");
+    onClose();
+  };
+  const submit = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (transactionId.trim().length < 3) return setError("Enter the transaction ID.");
+    setBusy(true);
+    try {
+      await api.post(`/clients/${encodeURIComponent(client.pan_number)}/payment-skip`, { transactionId: transactionId.trim(), remarks: remarks.trim() });
+      setTransactionId(""); setRemarks("");
+      onDone();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal open={open} onClose={close} title="Skip payment (paid offline)">
+      <form onSubmit={submit} className="space-y-4">
+        <div className="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800/60">
+          <p className="font-semibold text-slate-800 dark:text-slate-100">{client.client_name} · {client.pan_number}</p>
+          <p className="mt-0.5 text-slate-500">Scheme amount: <span className="font-semibold text-slate-800 dark:text-slate-100">₹{amount.toFixed(2)}</span></p>
+        </div>
+        <Field label="Transaction ID *">
+          <input className="input" value={transactionId} onChange={(e) => setTransactionId(e.target.value)} placeholder="Bank UTR / reference number" maxLength={100} autoFocus />
+        </Field>
+        <Field label="Remarks (optional)">
+          <input className="input" value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="e.g. Paid to the office HDFC account" maxLength={500} />
+        </Field>
+        <p className="text-xs text-slate-500">The payment is marked as paid offline and the client moves on to the live photo step. This can't be undone from the dashboard.</p>
+        {error && <p className="text-sm text-red-500">{error}</p>}
+        <div className="flex justify-end gap-2">
+          <button type="button" className="btn-outline" onClick={close} disabled={busy}>Cancel</button>
+          <button type="submit" className="btn-primary" disabled={busy || !transactionId.trim()}>{busy ? "Submitting…" : "Submit"}</button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+function StageValue({ label, skip, client, onSkip }) {
+  return (
+    <span className="inline-flex flex-wrap items-center gap-2">
+      {label}
+      {client.payment_skip === "Yes" && (
+        <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300" title={`By ${client.payment_skip_by || "—"} on ${fmtDateTime(client.payment_skip_at)}`}>
+          Payment skipped · {client.payment_skip_trn_id}
+        </span>
+      )}
+      {client.stage_key === "payment" && (
+        <button type="button" className="btn-outline btn-sm" onClick={onSkip} disabled={!skip?.allowed} title={skip?.allowed ? "Client paid offline: enter the transaction ID" : skip?.reason || ""}>
+          Skip
+        </button>
+      )}
+    </span>
+  );
+}
 
 const PREFERENCES = [
   "depository_credit_instruction", "pledge_instruction", "account_statement_requirement", "electronic_transaction_statement",
@@ -48,6 +120,8 @@ export default function ClientDetail() {
   const { data, error, loading, reload } = useLoader(() => api.get(`/clients/${encodeURIComponent(pan)}`), [pan]);
   const viewer = useFilePreview(`/clients/${encodeURIComponent(pan)}/files`);
   const sections = useMemo(() => (data ? groupFields(data.client) : []), [data]);
+  const [skipOpen, setSkipOpen] = useState(false);
+  const [notice, setNotice] = useState("");
 
   if (loading && !data) return <Loading />;
   if (error) return <div className="space-y-3"><button type="button" className="link text-sm" onClick={() => navigate(-1)}>← Back</button><ErrorBox error={error} onRetry={reload} /></div>;
@@ -67,10 +141,24 @@ export default function ClientDetail() {
           ["Client code", c.client_code ? <span className="inline-flex items-center">{c.client_code}<CopyButton value={c.client_code} /></span> : null],
           ["BOID", c.boid ? <span className="inline-flex items-center">{c.boid}<CopyButton value={c.boid} /></span> : null],
           ["Applied on", fmtDateTime(c.created_at)],
-          ["Stage", data.stageLabel],
+          ["Stage", <StageValue label={data.stageLabel} skip={data.paymentSkip} client={c} onSkip={() => setSkipOpen(true)} />],
           ["Current step", c.current_step ? titleCase(c.current_step) : null],
           ["RM", c.rm_email, { wide: true }],
         ]}
+      />
+      {data.paymentSkip && !data.paymentSkip.allowed && c.stage_key === "payment" && (
+        <p className="-mt-2 px-1 text-xs text-slate-500">Skip payment: {data.paymentSkip.reason}</p>
+      )}
+      {notice && <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">{notice}</p>}
+      <PaymentSkipModal
+        open={skipOpen}
+        onClose={() => setSkipOpen(false)}
+        client={c}
+        onDone={() => {
+          setSkipOpen(false);
+          setNotice("Payment skipped. The client has moved on to the live photo step.");
+          reload();
+        }}
       />
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.6fr)]">
